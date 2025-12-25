@@ -1,77 +1,19 @@
-# chess_pyside6.py
+# chess_buttons_inline.py
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget 
-from PySide6.QtGui import QPainter, QColor
-from PySide6.QtCore import QRect
-from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import QRect, QSize
 
 # ---------- DATA ----------
-
 board = [
-    "r",
-    "n",
-    "b",
-    "q",
-    "k",
-    "b",
-    "n",
-    "r",
-    "p",
-    "p",
-    "p",
-    "p",
-    "p",
-    "p",
-    "p",
-    "p",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "P",
-    "P",
-    "P",
-    "P",
-    "P",
-    "P",
-    "P",
-    "P",
-    "R",
-    "N",
-    "B",
-    "Q",
-    "K",
-    "B",
-    "N",
-    "R",
+    "r","n","b","q","k","b","n","r",
+    "p","p","p","p","p","p","p","p",
+    "0","0","0","0","0","0","0","0",
+    "0","0","0","0","0","0","0","0",
+    "0","0","0","0","0","0","0","0",
+    "0","0","0","0","0","0","0","0",
+    "P","P","P","P","P","P","P","P",
+    "R","N","B","Q","K","B","N","R",
 ]
 
 SVG = {
@@ -92,54 +34,56 @@ SVG = {
 class DrawBoard(QWidget):
     def __init__(self, board):
         super().__init__()
-
         self.board = board
+        self.buttons = []
 
-    def drawboard(self, painter):
-        x = 0
-        y = 0
-
-        newline = 0 
-
-        boxHeight = self.height() // 8 
+    def drawboard(self):
+        boxHeight = self.height() // 8
         boxWidth = self.width() // 8
 
-        color = False 
+        x = 0
+        y = 0
+        newline = 0
+        color = True
 
+        for i in self.board:
+            btn = QPushButton(self)
+            btn.setGeometry(x, y, boxWidth, boxHeight)
 
-        for i in self.board: 
-            if color == False:
-                painter.setBrush(QColor("#B58863"))
-                painter.setPen(QColor("#B58863"))   # border color
+            # Set color
+            if color:
+                btn.setStyleSheet("background-color: #EFD8B4;")
             else:
-                painter.setBrush(QColor("#EFD8B4"))
-                painter.setPen(QColor("#EFD8B4"))   # border color
-                
+                btn.setStyleSheet("background-color: #B58863;")
 
-            painter.drawRect(x, y, boxWidth, boxWidth)
+            # Set piece icon
+            if i != "0":
+                btn.setIcon(QIcon(SVG[i]))
+                btn.setIconSize(QSize(boxWidth-10, boxHeight-10))
+
+            self.buttons.append(btn)
+
+            newline += 1
             x += boxWidth
-            if color == False:
-                color = True
-            else:
-                color = False  
+            color = not color
 
-        # painter.setBrush(QColor("red"))   # fill color
-        # painter.setPen(QColor("black"))   # border color
+            if newline in {8,16,24,32,40,48,56,64}:
+                y += boxHeight
+                x = 0
+                color = not color
 
-        painter.drawRect(x, y, boxWidth, boxHeight)
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        self.drawboard(painter)
-
-
-
+    def resizeEvent(self, event):
+        # Redraw buttons on resize
+        for btn in self.buttons:
+            btn.setParent(None)
+        self.buttons = []
+        self.drawboard()
 
 app = QApplication(sys.argv)
-window = DrawBoard(board) 
-# window.drawboard()
-
+window = DrawBoard(board)
 window.setWindowTitle("Chess")
-window.resize(1000, 800)
-
+window.resize(800, 800)
 window.show()
+window.drawboard()
 app.exec()
+
