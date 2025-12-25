@@ -6,14 +6,70 @@ from PySide6.QtCore import QRect, QSize
 
 # ---------- DATA ----------
 board = [
-    "r","n","b","q","k","b","n","r",
-    "p","p","p","p","p","p","p","p",
-    "0","0","0","0","0","0","0","0",
-    "0","0","0","0","0","0","0","0",
-    "0","0","0","0","0","0","0","0",
-    "0","0","0","0","0","0","0","0",
-    "P","P","P","P","P","P","P","P",
-    "R","N","B","Q","K","B","N","R",
+    "r",
+    "n",
+    "b",
+    "q",
+    "k",
+    "b",
+    "n",
+    "r",
+    "p",
+    "p",
+    "p",
+    "p",
+    "p",
+    "p",
+    "p",
+    "p",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "P",
+    "P",
+    "P",
+    "P",
+    "P",
+    "P",
+    "P",
+    "P",
+    "R",
+    "N",
+    "B",
+    "Q",
+    "K",
+    "B",
+    "N",
+    "R",
 ]
 
 SVG = {
@@ -31,6 +87,7 @@ SVG = {
     "K": "data/king-w.svg",
 }
 
+
 class DrawBoard(QWidget):
     def __init__(self, board):
         super().__init__()
@@ -46,7 +103,7 @@ class DrawBoard(QWidget):
         newline = 0
         color = True
 
-        for i in self.board:
+        for index, i in enumerate(self.board):
             btn = QPushButton(self)
             btn.setGeometry(x, y, boxWidth, boxHeight)
 
@@ -59,7 +116,7 @@ class DrawBoard(QWidget):
             # Set piece icon
             if i != "0":
                 btn.setIcon(QIcon(SVG[i]))
-                btn.setIconSize(QSize(boxWidth-10, boxHeight-10))
+                btn.setIconSize(QSize(boxWidth - 10, boxHeight - 10))
 
             self.buttons.append(btn)
 
@@ -67,10 +124,16 @@ class DrawBoard(QWidget):
             x += boxWidth
             color = not color
 
-            if newline in {8,16,24,32,40,48,56,64}:
+            if newline in {8, 16, 24, 32, 40, 48, 56, 64}:
                 y += boxHeight
                 x = 0
                 color = not color
+
+            btn.clicked.connect(lambda checked, idx=index: self.on_button_click(index))
+
+    def on_button_click(self, index):
+         piece = self.board[index]
+         print(f"Button {index} clicked, piece: {piece}")
 
     def resizeEvent(self, event):
         # Redraw buttons on resize
@@ -79,6 +142,7 @@ class DrawBoard(QWidget):
         self.buttons = []
         self.drawboard()
 
+
 app = QApplication(sys.argv)
 window = DrawBoard(board)
 window.setWindowTitle("Chess")
@@ -86,4 +150,3 @@ window.resize(800, 800)
 window.show()
 window.drawboard()
 app.exec()
-
