@@ -1,4 +1,5 @@
 #include <array>
+#include <iostream>
 #include <raylib.h>
 #define BoardSize 64
 
@@ -35,6 +36,7 @@ public:
   void LoadTextures() {
     textures[WHITEPAWN + 6] =
         LoadTexture("/home/tahmid/ChessEngine/frontend/data/pawn-w.png");
+
     textures[BLACKPAWN + 6] =
         LoadTexture("/home/tahmid/ChessEngine/frontend/data/pawn-b.png");
 
@@ -77,6 +79,9 @@ public:
   }
 
   void DrawBoard() {
+
+    bool clicked = false;
+    int store = 0;
     while (!WindowShouldClose()) {
       BeginDrawing();
       ClearBackground(RAYWHITE);
@@ -87,9 +92,44 @@ public:
       bool color = true;
 
       int counter = 0;
-      for (int i = 0; i < BoardSize; i++) {
-        DrawRectangle(PosX, PosY, sizeX, SizeY, color ? WHITE : BLACK);
+
+      bool mousePressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+      Vector2 mousePos = GetMousePosition();
+
+      for (int i = 0; i < BoardSize; ++i) {
+        Color white = {240, 217, 181, 255};
+        Color black = {181, 136, 99, 255};
+
+        DrawRectangle(PosX, PosY, sizeX, SizeY, color ? white : black);
         DrawPiece(board[i], PosX, PosY);
+
+        Rectangle rect = {(float)PosX, (float)PosY, (float)sizeX, (float)SizeY};
+
+        if (CheckCollisionPointRec(mousePos, rect)) {
+          if (mousePressed && clicked) {
+            clicked = !clicked;
+            if (board[store] < 0 && board[i] >= 0 ||
+                board[store] > 0 && board[i] <= 0) {
+              board[i] = board[store];
+
+              board[store] = EMPTY;
+            } else {
+              std::cout << "SORRY BUT CANIBALISSSM IS NOT ALOWED IN CHESS";
+            }
+
+            // board[store] = EMPTY;
+            std::cout << "clicked=" << clicked
+                      << " mouse=" << IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
+                      << " i=" << i << '\n';
+          } else if (mousePressed && !clicked) {
+            clicked = !clicked;
+            store = i;
+            std::cout << "clicked=" << clicked
+                      << " mouse=" << IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
+                      << " i=" << i << '\n';
+          }
+        }
+
         PosX += sizeX;
         color = !color;
 
@@ -102,7 +142,6 @@ public:
       }
       EndDrawing();
     }
-    CloseWindow();
   }
 };
 
@@ -136,5 +175,6 @@ int main() {
   b.LoadTextures();
   b.DrawBoard();
   b.UnloadTextures();
+  CloseWindow();
   return 0;
 }
