@@ -81,7 +81,7 @@ public:
   void DrawBoard() {
 
     bool clicked = false;
-    int store = 0;
+    int Location = 0;
     while (!WindowShouldClose()) {
       BeginDrawing();
       ClearBackground(RAYWHITE);
@@ -108,22 +108,31 @@ public:
         if (CheckCollisionPointRec(mousePos, rect)) {
           if (mousePressed && clicked) {
             clicked = !clicked;
-            if (board[store] < 0 && board[i] >= 0 ||
-                board[store] > 0 && board[i] <= 0) {
-              board[i] = board[store];
+            if (board[Location] < 0 && board[i] >= 0 ||
+                board[Location] > 0 && board[i] <= 0) {
+              // THIS IS WEHERE CHECKLING COMES INT
+              if (board[Location] == 1) {
+                if (Location > 48 && Location < 56) {
+                  if (i == Location + 16 || i == Location + 8) {
+                    board[i] = board[Location];
+                  }
+                }
+              }
+              // THIS IS WHERE IT ENDS
+              board[i] = board[Location];
 
-              board[store] = EMPTY;
+              board[Location] = EMPTY;
             } else {
               std::cout << "SORRY BUT CANIBALISSSM IS NOT ALOWED IN CHESS";
             }
 
-            // board[store] = EMPTY;
+            // board[Location] = EMPTY;
             std::cout << "clicked=" << clicked
                       << " mouse=" << IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
                       << " i=" << i << '\n';
           } else if (mousePressed && !clicked) {
             clicked = !clicked;
-            store = i;
+            Location = i;
             std::cout << "clicked=" << clicked
                       << " mouse=" << IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
                       << " i=" << i << '\n';
@@ -170,7 +179,9 @@ int main() {
 
       WHITEROOK, WHITEKNIGHT, WHITEBISHOP, WHITEQUEEN,
       WHITEKING, WHITEBISHOP, WHITEKNIGHT, WHITEROOK};
+
   Board b = Board(1000, 1000, board);
+
   InitWindow(b.height, b.width, "GigaEngine");
   b.LoadTextures();
   b.DrawBoard();
